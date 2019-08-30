@@ -26,6 +26,10 @@ cc.Class({
 
     getUserIndex:function(){
         return this.useIndex;
+    },
+
+    getColor:function(){
+        return this.node.color;
     }
 
 });

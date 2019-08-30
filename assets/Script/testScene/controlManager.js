@@ -7,14 +7,14 @@ cc.Class({
             type: require("shapeAllNodeManager"),
         },
 
-        item:{
-            default: null,
-            type: cc.Node
-        },
-
         itemPrefab:{
             default: null,
             type: cc.Prefab
+        },
+
+        gameOver:{
+            default: null,
+            type: cc.Node
         },
 
         dropTime: 0.5,
@@ -22,6 +22,7 @@ cc.Class({
     },
 
     onLoad: function () {
+        this.gameOver.active = false;
         this.createNewItem();
         this.itemPos = this.item.getPosition();
         this.tempTime = 0;
@@ -59,12 +60,52 @@ cc.Class({
                 tempPosArr[j].y -= tempY;
             }
         }
+        cc.log ("rotateRightAni:1",this.specialCheckCollision(this.item,tempPosArr));
+        cc.log ("rotateRightAni:2",this.checkRotationCollision(this.item,tempPosArr));
 
-        if (this.specialCheckCollision(this.item,tempPosArr)){
+        if (this.specialCheckCollision(this.item,tempPosArr) && this.checkRotationCollision(this.item,tempPosArr)){
+            
             for (let t = 0; t < tempPosArr.length; t++){
                 child[t].setPosition(tempPosArr[t].x,tempPosArr[t].y);
+            }   
+        }
+    },
+
+    checkRotationCollision:function(item,posArr){
+        let bool  = true;
+        let tempDistance = -1;
+        if (item.x + item.width > this.node.width/2 ){
+            for (let i = 0; i< posArr.length; i++){
+                let worldPos = item.convertToWorldSpaceAR(cc.v2(posArr[i].x,posArr[i].y));
+                let localPos = this.node.convertToNodeSpaceAR(worldPos);
+                let beyondDistance = localPos.x + this.shapeWidth - this.node.width/2;
+                if (beyondDistance > 0){
+                    bool = false;
+                    if (beyondDistance > tempDistance){
+                        tempDistance = beyondDistance;
+                    }                   
+                }
             }
         }
+        let tempPosArr = [];
+        let specialBool = false;
+        if (!bool && tempDistance != -1 ){
+            for (let i = 0; i < posArr.length; i++){
+                tempPosArr[i] = {};
+                tempPosArr[i].x = posArr[i].x - tempDistance ;
+                tempPosArr[i].y = posArr[i].y;
+            }
+            let specialBool = this.specialCheckCollision(item,tempPosArr);
+            if (specialBool){
+                item.setPositionX(item.getPosition().x - tempDistance);
+            }
+        }
+        cc.log("checkRotationCollision:1",JSON.stringify(posArr));
+        cc.log("checkRotationCollision:2",JSON.stringify(tempPosArr));
+
+        cc.log("checkRotationCollision:----",bool,specialBool,tempDistance);
+
+        return bool || specialBool;
     },
 
     leftAni:function(){
@@ -84,6 +125,9 @@ cc.Class({
     rightAni:function(){
         if (this.item.x + this.item.width >= this.node.width/2){
             cc.log("right allow");
+            if (this.checkRightCollision(this.item)){
+                this.item.setPositionX(this.item.getPosition().x + this.shapeWidth);
+            }
             return;
         }else{
             if (this.checkCollision(this.item, this.shapeWidth,0)){
@@ -94,6 +138,24 @@ cc.Class({
         }
         
     },
+
+    checkRightCollision:function(item){
+        let bool  = true;
+        let child = item.children;
+        let childCount = item.childrenCount;
+        cc.log("checkRightCollision:",childCount);
+        for (let i = 0; i< childCount; i++){
+            let worldPos = item.convertToWorldSpaceAR(cc.v2(child[i].x + this.shapeWidth,child[i].y));
+            let localPos = this.node.convertToNodeSpaceAR(worldPos);
+            cc.log("checkRightCollision: localPos = ",localPos, " this.node.width /2 =  ",this.node.width/2);
+            if (localPos.x >= this.node.width/2){
+                bool = false;
+            }
+        }
+        return bool;
+    },
+
+    
 
     update:function(dt){
         this.rotationBool = true;
@@ -151,6 +213,7 @@ cc.Class({
     },
 
     destroyItem:function(item){
+        
         let child = item.children;
         let childCount = item.childrenCount;
         cc.log("childCount",childCount);
@@ -162,12 +225,30 @@ cc.Class({
 
         this.shapeAllNode.checkScore();
 
+        if (item.getPosition().y >= this.node.height/2 - this.item.height){
+            this.gameOver.active = true;
+        }else{
+            this.createNewItem();
+        }  
+    },
 
+    restart:function(){
+        this.gameOver.active = false;
+        this.tempTime = 0;
+        this.shapeAllNode.init();
         this.createNewItem();
+        this.itemPos = this.item.getPosition();
     },
 
     createNewItem:function(){
         this.item = cc.instantiate(this.itemPrefab);
         this.node.addChild(this.item);
+        this.item.setPositionY(this.node.height/2 - this.item.height);
+        this.dropTime = 0.5;
+    },
+
+
+    dropNow:function(){
+        this.dropTime = 0.01;
     }
 });

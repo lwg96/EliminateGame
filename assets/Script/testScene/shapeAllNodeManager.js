@@ -52,6 +52,20 @@ cc.Class({
         return userIndexArr;
     },
 
+    getTopRowNumber:function(){
+        let topRow = 0;
+        let userIndexArr = this.getAllShapeUseIndex();
+        for (let i = 0; i< userIndexArr.length; i++){
+            for (let j = 0;j < userIndexArr[i].length; j++){
+                if(userIndexArr[i][j] == 1){
+                    topRow = i;
+                    break;
+                }
+            }
+        }
+        return topRow;
+    },
+
     checkCollision:function(pos){
         let localPos = this.node.convertToNodeSpaceAR(pos);
         let i = Math.floor(localPos.y/50);
@@ -77,12 +91,33 @@ cc.Class({
             }
         }
 
-
-
-
         for (let t = 0; t < scoreLine.length; t++){
-            scoreLine[t].getComponent("shapeItem").setColor(cc.Color.GRAY);
+            for (let p = 0; p < this.shapeItemArr[scoreLine[t]].length; p++){
+                this.shapeItemArr[scoreLine[t]][p].getComponent("shapeItem").setColor(cc.Color.GRAY);
+            } 
         }
-    }
+
+        for (let t = scoreLine.length -1 ; t>=0;t--){
+            this.resfreshAllNode(scoreLine[t]);
+        }
+        
+    },
+
+    resfreshAllNode:function(lowRow){
+
+        let topRow = this.getTopRowNumber();
+        cc.log("resfreshAllNode: ",lowRow ," topRow: ",topRow );
+        for (let i = lowRow ;i <= topRow; i++){
+            for (let j = 0; j < this.shapeItemArr[i].length; j++){
+                if (i == topRow){
+                    this.shapeItemArr[i][j].getComponent("shapeItem").setColor(cc.Color.GRAY);
+                }else{
+                    let color = this.shapeItemArr[i+1][j].getComponent("shapeItem").getColor();
+                    let index = this.shapeItemArr[i+1][j].getComponent("shapeItem").getUserIndex();
+                    this.shapeItemArr[i][j].getComponent("shapeItem").setColor(color,index);
+                }
+            }
+        }
+    },
 
 });
