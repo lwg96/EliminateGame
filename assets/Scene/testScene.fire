@@ -34,6 +34,9 @@
     "_children": [
       {
         "__id__": 2
+      },
+      {
+        "__id__": 40
       }
     ],
     "_localZOrder": 0,
@@ -1466,14 +1469,21 @@
     "shapeAllNode": {
       "__id__": 5
     },
-    "itemPrefab": {
-      "__uuid__": "54173498-1fce-43d7-827b-fcd31daad9dc"
-    },
+    "itemPrefabs": [
+      {
+        "__uuid__": "54173498-1fce-43d7-827b-fcd31daad9dc"
+      },
+      {
+        "__uuid__": "f79d1869-e294-450c-bf7f-2032bb1fab84"
+      },
+      {
+        "__uuid__": "f2cf1aa3-f466-4c81-9d59-8b5c6a7e41f5"
+      }
+    ],
     "gameOver": {
       "__id__": 30
     },
-    "dropTime": 0.5,
-    "shapeWidth": 50
+    "dropTime": 0.5
   },
   {
     "__type__": "cc.Canvas",
@@ -1490,5 +1500,69 @@
     },
     "_fitWidth": true,
     "_fitHeight": false
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "GameManager",
+    "_objFlags": 0,
+    "_opacity": 255,
+    "_color": {
+      "__type__": "cc.Color",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "_cascadeOpacityEnabled": true,
+    "_parent": {
+      "__id__": 1
+    },
+    "_anchorPoint": {
+      "__type__": "cc.Vec2",
+      "x": 0.5,
+      "y": 0.5
+    },
+    "_contentSize": {
+      "__type__": "cc.Size",
+      "width": 0,
+      "height": 0
+    },
+    "_children": [],
+    "_rotationX": 0,
+    "_rotationY": 0,
+    "_scaleX": 1,
+    "_scaleY": 1,
+    "_position": {
+      "__type__": "cc.Vec2",
+      "x": 320,
+      "y": 480
+    },
+    "_skewX": 0,
+    "_skewY": 0,
+    "_localZOrder": 0,
+    "_globalZOrder": 0,
+    "_tag": -1,
+    "_opacityModifyRGB": false,
+    "_id": "d7b62eKmXtHEqB91JbZdA6n",
+    "_active": true,
+    "_components": [
+      {
+        "__id__": 41
+      }
+    ],
+    "_prefab": null,
+    "groupIndex": 0
+  },
+  {
+    "__type__": "36d0dWaYCBHWLtCwPsop+T7",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 40
+    },
+    "_enabled": true,
+    "middleNode": {
+      "__id__": 38
+    }
   }
 ]

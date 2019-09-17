@@ -7,9 +7,9 @@ cc.Class({
             type: require("shapeAllNodeManager"),
         },
 
-        itemPrefab:{
-            default: null,
-            type: cc.Prefab
+        itemPrefabs:{
+            default: [],
+            type: [cc.Prefab]
         },
 
         gameOver:{
@@ -18,10 +18,14 @@ cc.Class({
         },
 
         dropTime: 0.5,
-        shapeWidth: 50,
     },
 
-    onLoad: function () {
+    onLoad:function(){
+
+    },
+
+    init: function () {
+        cc.log("222222222222222222222222222222");
         this.gameOver.active = false;
         this.createNewItem();
         this.itemPos = this.item.getPosition();
@@ -78,7 +82,7 @@ cc.Class({
             for (let i = 0; i< posArr.length; i++){
                 let worldPos = item.convertToWorldSpaceAR(cc.v2(posArr[i].x,posArr[i].y));
                 let localPos = this.node.convertToNodeSpaceAR(worldPos);
-                let beyondDistance = localPos.x + this.shapeWidth - this.node.width/2;
+                let beyondDistance = localPos.x + GAME_CONFIG.shapeWidth - this.node.width/2;
                 if (beyondDistance > 0){
                     bool = false;
                     if (beyondDistance > tempDistance){
@@ -113,8 +117,8 @@ cc.Class({
             cc.log("left allow");
             return;
         }else{
-            if (this.checkCollision(this.item,- this.shapeWidth,0)){
-                this.item.setPositionX(this.item.getPosition().x - this.shapeWidth);
+            if (this.checkCollision(this.item,- GAME_CONFIG.shapeWidth,0)){
+                this.item.setPositionX(this.item.getPosition().x - GAME_CONFIG.shapeWidth);
             }else{
                 cc.log("checkCollision left allow");
             } 
@@ -126,12 +130,12 @@ cc.Class({
         if (this.item.x + this.item.width >= this.node.width/2){
             cc.log("right allow");
             if (this.checkRightCollision(this.item)){
-                this.item.setPositionX(this.item.getPosition().x + this.shapeWidth);
+                this.item.setPositionX(this.item.getPosition().x + GAME_CONFIG.shapeWidth);
             }
             return;
         }else{
-            if (this.checkCollision(this.item, this.shapeWidth,0)){
-                this.item.setPositionX(this.item.getPosition().x + this.shapeWidth);
+            if (this.checkCollision(this.item, GAME_CONFIG.shapeWidth,0)){
+                this.item.setPositionX(this.item.getPosition().x + GAME_CONFIG.shapeWidth);
             }else{
                 cc.log("checkCollision right allow");
             } 
@@ -145,7 +149,7 @@ cc.Class({
         let childCount = item.childrenCount;
         cc.log("checkRightCollision:",childCount);
         for (let i = 0; i< childCount; i++){
-            let worldPos = item.convertToWorldSpaceAR(cc.v2(child[i].x + this.shapeWidth,child[i].y));
+            let worldPos = item.convertToWorldSpaceAR(cc.v2(child[i].x + GAME_CONFIG.shapeWidth,child[i].y));
             let localPos = this.node.convertToNodeSpaceAR(worldPos);
             cc.log("checkRightCollision: localPos = ",localPos, " this.node.width /2 =  ",this.node.width/2);
             if (localPos.x >= this.node.width/2){
@@ -158,6 +162,9 @@ cc.Class({
     
 
     update:function(dt){
+        if (this.gameOver.active){
+            return;
+        }
         this.rotationBool = true;
         this.tempTime += dt;
         if (this.tempTime > this.dropTime){
@@ -168,8 +175,8 @@ cc.Class({
                 this.item.y = this.node.y - this.node.height/2;
                 this.destroyItem(this.item);
             }else{
-                if (this.checkCollision(this.item,0,-this.shapeWidth)){
-                    this.item.setPositionY(this.item.getPosition().y - this.shapeWidth);
+                if (this.checkCollision(this.item,0,-GAME_CONFIG.shapeWidth)){
+                    this.item.setPositionY(this.item.getPosition().y - GAME_CONFIG.shapeWidth);
                 }else{
                     this.destroyItem(this.item);
                 }
@@ -241,7 +248,12 @@ cc.Class({
     },
 
     createNewItem:function(){
-        this.item = cc.instantiate(this.itemPrefab);
+        //Math.random() 不包括1
+        if(this.item){
+            this.item.destroy();
+        }
+        let random = Math.floor(Math.random()*3);
+        this.item = cc.instantiate(this.itemPrefabs[random]);
         this.node.addChild(this.item);
         this.item.setPositionY(this.node.height/2 - this.item.height);
         this.dropTime = 0.5;

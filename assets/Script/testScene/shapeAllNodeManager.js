@@ -6,7 +6,6 @@ cc.Class({
             default: null,
             type: cc.Prefab
         },
-
     },
     onLoad:function(){
         this.parentWidth = this.node.parent.width;
@@ -16,13 +15,16 @@ cc.Class({
     init:function(){
 
         let shapeItemArr = [];
-        for (let i = 0; i < 12; i++){
+        for (let i = 0; i < GAME_CONFIG.allRows; i++){
             let shapeItem = [];
-            for (let j = 0; j < 12; j++){
+            for (let j = 0; j < GAME_CONFIG.allRows; j++){
                 let item = cc.instantiate(this.shapePrefab);
                 this.node.addChild(item);
                 item.setPosition(item.width * j, item.height*i);
                 item.getComponent("shapeItem").init();
+                if (i > GAME_CONFIG.topRows){
+                    item.getComponent("shapeItem").setColor(cc.Color.BLACK);
+                }
                 shapeItem.push(item);
             }
             shapeItemArr.push(shapeItem);
@@ -33,10 +35,15 @@ cc.Class({
 
     changeData:function(pos,color){
         let localPos = this.node.convertToNodeSpaceAR(pos);
-        let i = Math.floor(localPos.y/50);
-        let j = Math.floor(localPos.x/50);
+        let i = Math.floor(localPos.y/GAME_CONFIG.shapeHeight);
+        let j = Math.floor(localPos.x/GAME_CONFIG.shapeWidth);
         cc.log("changeData:", i ,"changeData:",j);
-        this.shapeItemArr[i][j].getComponent("shapeItem").setColor(color,true);        
+        if(i > GAME_CONFIG.topRows){
+            this.shapeItemArr[i][j].getComponent("shapeItem").setColor(cc.Color.BLACK);
+        }else{
+            this.shapeItemArr[i][j].getComponent("shapeItem").setColor(color,true);        
+        }
+        
     },
 
     getAllShapeUseIndex:function(){
@@ -68,8 +75,8 @@ cc.Class({
 
     checkCollision:function(pos){
         let localPos = this.node.convertToNodeSpaceAR(pos);
-        let i = Math.floor(localPos.y/50);
-        let j = Math.floor(localPos.x/50);
+        let i = Math.floor(localPos.y/GAME_CONFIG.shapeHeight);
+        let j = Math.floor(localPos.x/GAME_CONFIG.shapeWidth);
         let userIndexArr = this.getAllShapeUseIndex();
         if (userIndexArr[i][j] == 1){
             return false;
